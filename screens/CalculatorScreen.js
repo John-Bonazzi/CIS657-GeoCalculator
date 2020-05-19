@@ -32,9 +32,9 @@ const CalculatorScreen = () =>{
 
     const isNum = (val, allowEmpty=true) => {
         if(allowEmpty)
-            return /^[+-]?\d*\.?\d*$/.test(val);
+            return /^[+-]?\d*\.?\d*$/.test(val); // This counts empty strings as NOT an error
         else
-            return /^[+-]?\d+\.?\d*$/.test(val);
+            return /^[+-]?\d+\.?\d*$/.test(val); // This counts empty strings as an error
     };
 
     const errorChecking = (val) => {
