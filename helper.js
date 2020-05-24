@@ -22,7 +22,7 @@ function computeDistance(lat1, lon1, lat2, lon2) {
       Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c;
-  return `${round(d, 3)} km`;
+  return `${round(d, 3)}`;
 }
 
 // Computes bearing between two geo coordinates in degrees.
@@ -38,7 +38,7 @@ function computeBearing(startLat, startLng, destLat, destLng) {
     Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
   var brng = Math.atan2(y, x);
   brng = toDegrees(brng);
-  return `${round((brng + 360) % 360, 3)} degrees`;
+  return `${round((brng + 360) % 360, 3)}`;
 }
 
 function round(value, decimals) {

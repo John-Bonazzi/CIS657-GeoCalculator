@@ -5,13 +5,17 @@ import {computeBearing, computeDistance} from '../helper'
 import { Feather } from '@expo/vector-icons'; 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-const inputTheme = {
+const theme = {
     Input:{
         errorStyle: {
             color: 'red',
         },
         keyboardType: 'default',
         renderErrorMessage: false,
+        placeholderTextColor: '#85857E',
+        inputStyle:{
+            color: '#D1D1C7',
+        },
     },
     Button:{
         buttonStyle:{
@@ -24,7 +28,7 @@ const inputTheme = {
 };
 
 const CalculatorScreen = ({ route, navigation }) =>{
-    const [state, setState] = useState({lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: ''})
+    const [state, setState] = useState({lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceSuffix: 'Kilometers', bearingSuffix: 'Degrees'});
 
     const updateStateObject = (vals) => {
         setState({
@@ -51,8 +55,8 @@ const CalculatorScreen = ({ route, navigation }) =>{
 
     const compute = () => {
         if(isNum(state.lat1, false) && isNum(state.lat2, false) && isNum(state.lon1, false) && isNum(state.lon2, false)){
-            updateStateObject({bearing: `Bearing: ${computeBearing(state.lat1, state.lon1, state.lat2, state.lon2)}`, 
-                distance: `Distance: ${computeDistance(state.lat1, state.lon1, state.lat2, state.lon2)}`});
+            updateStateObject({bearing: `${computeBearing(state.lat1, state.lon1, state.lat2, state.lon2)} ${state.bearingSuffix}`, 
+                distance: `${computeDistance(state.lat1, state.lon1, state.lat2, state.lon2)} ${state.distanceSuffix}`});
         }
     };
 
@@ -73,7 +77,7 @@ const CalculatorScreen = ({ route, navigation }) =>{
 
     return(
         <View style={styles.container}>
-            <ThemeProvider theme={inputTheme}>
+            <ThemeProvider theme={theme}>
                 <Input
                     placeholder="Enter latitude for point 1"
                     onChangeText={(val) => updateStateObject({lat1: val})}
@@ -102,8 +106,17 @@ const CalculatorScreen = ({ route, navigation }) =>{
                     onPress={() => updateStateObject({lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: ''})}
                     />
             </ThemeProvider>
-            <Text>{state.distance}</Text>
-            <Text>{state.bearing}</Text>
+            <View style={styles.gridRow}>
+                <View style={[styles.gridBlock, {marginTop: 10}]}><View style={styles.block}><Text> Distance: </Text></View></View>
+                <View style={[styles.gridBlock, {marginTop: 10}]}><View style={styles.block}><Text>{state.distance}</Text></View></View>
+            </View>
+            <View style={styles.gridRow}>
+                <View style={styles.gridBlock}><View style={styles.block}><Text> Bearing: </Text></View></View>
+                <View style={styles.gridBlock}><View style={styles.block}><Text>{state.bearing}</Text></View></View>
+            </View>
+            {/*<View style={styles.emptySpace}></View>*/}
+                
+                
         </View>
         );
 }
@@ -112,6 +125,22 @@ const styles = StyleSheet.create({
     container: {
         margin: 20,
         flex: 1,
+    },
+    gridRow: {
+        flexDirection: 'row',
+        //flex: 1,
+    },
+    gridBlock:{
+        backgroundColor: '#D1D1C7',
+        marginBottom: 1,
+        marginRight: 1,
+        flex: 1,
+    },
+    block:{
+        margin: 10,
+    },
+    emptySpace:{
+        flex: 6,
     },
 });
 
