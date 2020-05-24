@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { StyleSheet, Text, View, TextInput } from 'react-native'
 import { ThemeProvider, Button, Input } from 'react-native-elements'
 import {computeBearing, computeDistance} from '../helper'
+import { Feather } from '@expo/vector-icons'; 
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const inputTheme = {
     Input:{
@@ -12,15 +14,16 @@ const inputTheme = {
         renderErrorMessage: false,
     },
     Button:{
+        buttonStyle:{
+            backgroundColor: '#85857E',
+        },
         containerStyle:{
             marginTop: 15,
         },
     },
 };
 
-
-
-const CalculatorScreen = () =>{
+const CalculatorScreen = ({ route, navigation }) =>{
     const [state, setState] = useState({lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: ''})
 
     const updateStateObject = (vals) => {
@@ -52,6 +55,21 @@ const CalculatorScreen = () =>{
                 distance: `Distance: ${computeDistance(state.lat1, state.lon1, state.lat2, state.lon2)}`});
         }
     };
+
+    navigation.setOptions({
+        headerStyle: {
+            backgroundColor: '#B8B8AE',
+        },
+        cardStyle: {
+            backgroundColor: '#383835',
+        },
+        headerRight: () => (
+            <TouchableOpacity
+            >
+                <Feather name="settings" style={{marginRight: 10}} size={24} color="black" />{/*style and 'marginRight' used for curved screens, or the component looks weird*/ }
+            </TouchableOpacity>
+        ),
+    });
 
     return(
         <View style={styles.container}>
@@ -93,6 +111,7 @@ const CalculatorScreen = () =>{
 const styles = StyleSheet.create({
     container: {
         margin: 20,
+        flex: 1,
     },
 });
 
