@@ -1,28 +1,31 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Settings  } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import CalculatorScreen from './screens/CalculatorScreen';
- 
+import CalculatorSettings from './screens/CalculatorSettings';
+
 export default function App() {
   const Stack = createStackNavigator();
-
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name='CalculatorScreen' component={CalculatorScreen} />
+    <NavigationContainer>   
+      <Stack.Navigator >
+          <Stack.Screen options={headerBasics} name='CalculatorScreen' component={CalculatorScreen} />
+          <Stack.Screen options={headerBasics} name='CalculatorSettings' component={CalculatorSettings} />
       </Stack.Navigator>
     </NavigationContainer>
   );
- /*return (
-   <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-     <SafeAreaView style={styles.container} >
-       <CalculatorScreen />
-     </SafeAreaView>
-   </TouchableWithoutFeedback>
- );*/
 }
- 
+
+const headerBasics = {
+  headerStyle: {
+    backgroundColor: '#B8B8AE',
+  },
+  cardStyle: {
+    backgroundColor: '#383835',
+  },
+};
+
 const styles = StyleSheet.create({
  container: {
    backgroundColor: "#fff",
