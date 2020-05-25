@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
 import { ThemeProvider, Button, Input } from 'react-native-elements'
-import { computeBearing, computeDistance } from '../helper'
+import { computeBearing, computeDistance, round } from '../helper'
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -28,7 +28,8 @@ const theme = {
 };
 
 const CalculatorScreen = ({ route, navigation }) => {
-    const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceSuffix: 'Kilometers', bearingSuffix: 'Degrees' });
+    console.log(route.params);
+    const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceText: '', bearingText: '', distanceUnits: 'Kilometers', bearingUnits: 'Degrees' });
 
     const updateStateObject = (vals) => {
         setState({
@@ -36,6 +37,82 @@ const CalculatorScreen = ({ route, navigation }) => {
             ...vals,
         });
     };
+
+    const [distanceMultipliers, setDMult] = useState({ multiplier: 1.0, toMetricMultiplier: 0.621371, toImperialMultiplier: 1.60934, });
+    const updateDMultObject = (vals) => {
+        setDMult({
+            ...distanceMultipliers,
+            ...vals,
+        });
+    };
+    const [bearingMultipliers, setBMult] = useState({ multiplier: 1.0, toDegreeMultiplier: 0.056249999999999, toMilMultiplier: 17.777777777778, });
+    const updateBMultObject = (vals) => {
+        setBMult({
+            ...bearingMultipliers,
+            ...vals,
+        });
+    };
+
+    useEffect(() => {
+        let dist = state.distance;
+        let distUnits = state.distanceUnits;
+        let bear = state.bearing;
+        let bearUnits = state.bearingUnits;
+        if(route.params?.distanceUnits){
+            if(!(distUnits===route.params.distanceUnits)){
+                let mult = 1.0;
+                distUnits = route.params.distanceUnits;
+                if(distUnits==='Kilometers'){
+                    dist *=  distanceMultipliers.toMetricMultiplier;
+                }
+                else if(distUnits==='Miles'){
+                    dist *= distanceMultipliers.toImperialMultiplier;
+                    mult = distanceMultipliers.toImperialMultiplier;
+                }
+                dist = round(dist, 3);
+                
+                updateDMultObject({
+                    multiplier: mult,
+                });
+            }
+        }
+        if(route.params?.bearingUnits){
+            if(!(bearUnits===route.params.bearingUnits)){
+                let mult = 1.0;
+                bearUnits = route.params.bearingUnits;
+                if(bearUnits==='Degrees'){
+                    bear *= bearingMultipliers.toDegreeMultiplier;
+                }
+                else if(bearUnits==='Mils'){
+                    bear *= bearingMultipliers.toMilMultiplier;
+                    mult = bearingMultipliers.toMilMultiplier;
+                }
+                bear = round(bear, 3);
+                updateBMultObject({
+                    multiplier: mult,
+                });
+            }
+        }
+        if(!(dist===undefined || dist==0) && !(bear===undefined || bear==0)){
+            updateStateObject({
+                distance: dist,
+                distanceUnits: distUnits,
+                distanceText: `${dist} ${distUnits}`,
+                bearing: bear,
+                bearingUnits: bearUnits,
+                bearingText: `${bear} ${bearUnits}`,
+            });
+        }
+        else{
+            updateStateObject({
+                distance: dist,
+                distanceUnits: distUnits,
+                bearing: bear,
+                bearingUnits: bearUnits,
+            });
+    }
+        
+    }, [route.params?.distanceUnits, route.params?.bearingUnits]);
 
     const isNum = (val, allowEmpty = true) => {
         if (allowEmpty)
@@ -55,9 +132,16 @@ const CalculatorScreen = ({ route, navigation }) => {
 
     const compute = () => {
         if (isNum(state.lat1, false) && isNum(state.lat2, false) && isNum(state.lon1, false) && isNum(state.lon2, false)) {
+            let dist = computeDistance(state.lat1, state.lon1, state.lat2, state.lon2) * distanceMultipliers.multiplier;
+            dist = round(dist, 3);
+            console.log('compute multipl: ' + distanceMultipliers.multiplier);
+            let bear = computeBearing(state.lat1, state.lon1, state.lat2, state.lon2) * bearingMultipliers.multiplier;
+            bear = round(bear, 3);
             updateStateObject({
-                bearing: `${computeBearing(state.lat1, state.lon1, state.lat2, state.lon2)} ${state.bearingSuffix}`,
-                distance: `${computeDistance(state.lat1, state.lon1, state.lat2, state.lon2)} ${state.distanceSuffix}`
+                distance: dist,
+                bearing: bear,
+                distanceText: `${dist} ${state.distanceUnits}`,
+                bearingText: `${bear} ${state.bearingUnits}`,  
             });
         }
     };
@@ -66,8 +150,13 @@ const CalculatorScreen = ({ route, navigation }) => {
         headerRight: () => (
             <TouchableOpacity
                 onPress={() => {
-                    navigation.navigate('CalculatorSettings', {...state.distanceSuffix, ...state.bearingSuffix});
-                }}
+                    let distanceUnits = state.distanceUnits;
+                    let bearingUnits = state.bearingUnits;
+                    navigation.navigate('CalculatorSettings', { 
+                        distanceUnits,
+                        bearingUnits});
+                    }
+                }
             >
                 <Feather name="settings" style={{ marginRight: 10 }} size={24} color="black" />{/*style and 'marginRight' used for curved screens, or the component looks weird*/}
             </TouchableOpacity>
@@ -103,18 +192,17 @@ const CalculatorScreen = ({ route, navigation }) => {
                         onPress={() => compute()} />
                     <Button
                         title='Clear'
-                        onPress={() => updateStateObject({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '' })}
+                        onPress={() => updateStateObject({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '' , bearingText: '', distanceText: ''})}
                     />
                 </ThemeProvider>
                 <View style={styles.gridRow}>
                     <View style={[styles.gridBlock, { marginTop: 10 }]}><View style={styles.block}><Text> Distance: </Text></View></View>
-                    <View style={[styles.gridBlock, { marginTop: 10 }]}><View style={styles.block}><Text>{state.distance}</Text></View></View>
+                    <View style={[styles.gridBlock, { marginTop: 10 }]}><View style={styles.block}><Text>{state.distanceText}</Text></View></View>
                 </View>
                 <View style={styles.gridRow}>
                     <View style={styles.gridBlock}><View style={styles.block}><Text> Bearing: </Text></View></View>
-                    <View style={styles.gridBlock}><View style={styles.block}><Text>{state.bearing}</Text></View></View>
+                    <View style={styles.gridBlock}><View style={styles.block}><Text>{state.bearingText}</Text></View></View>
                 </View>
-                {/*<View style={styles.emptySpace}></View>*/}
 
             </SafeAreaView>
         </TouchableWithoutFeedback>

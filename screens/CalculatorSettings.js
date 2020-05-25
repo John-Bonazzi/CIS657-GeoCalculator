@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-material-dropdown';
 
 const CalculatorSettings = ({ route, navigation }) => {
-    const [state, setState] = useState({ distanceUnits: {...route.params.distanceUnits}, bearingUnits: {...route.params.bearingUnits} });
-
+    console.log(route.params);
+    const defaultDistanceUnits = route.params.distanceUnits;
+    const defaultBearingUnits = route.params.bearingUnits;
+    const [state, setState] = useState({ distanceUnits: defaultDistanceUnits, bearingUnits: defaultBearingUnits });
     const updateStateObject = (vals) => {
         setState({
             ...state,
@@ -29,16 +31,18 @@ const CalculatorSettings = ({ route, navigation }) => {
             textAlign: 'center',
         },
         headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('CalculatorScreen')}>
+            <TouchableOpacity style={{marginRight: 5}} onPress={() => navigation.navigate('CalculatorScreen')}>
                 <Text> Cancel </Text>
             </TouchableOpacity>
         ),
         headerLeft: () => (
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity style={{marginLeft: 5}} onPress={() =>{
+                let distanceUnits = state.distanceUnits
+                let bearingUnits = state.bearingUnits
                 navigation.navigate('CalculatorScreen', {
-                    ...state.distanceUnits,
-                    ...state.bearingUnits
-                });
+                    distanceUnits,
+                    bearingUnits,
+                })
             }}
             >
                 <Text> Save </Text>
@@ -49,8 +53,8 @@ const CalculatorSettings = ({ route, navigation }) => {
     return (
         <View style={styles.container}>
             <Dropdown
-                defualtValue="wow"
                 label="Distance Units"
+                placeholder={route.params.distanceUnits}
                 data={distanceData}
                 selectedItemColor='black'
                 baseColor='#fff'
@@ -59,6 +63,7 @@ const CalculatorSettings = ({ route, navigation }) => {
             />
             <Dropdown
                 label="Bearing Units"
+                placeholder={route.params.bearingUnits}
                 data={bearingData}
                 selectedItemColor='black'
                 baseColor='#fff'
@@ -71,7 +76,9 @@ const CalculatorSettings = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
     container: {
-        margin: 30,
+        marginTop: 10,
+        marginLeft: 30,
+        marginRight: 30,
     },
 });
 
