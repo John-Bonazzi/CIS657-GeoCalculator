@@ -20,11 +20,19 @@ const CalculatorSettings = ({ route, navigation }) => {
     }, {
         value: 'Miles',
     }];
+    let selectedDistanceValue = distanceData[0].value
+    if (!(defaultDistanceUnits===selectedDistanceValue)){
+        selectedDistanceValue = distanceData[1].value;
+    }
     const bearingData = [{
         value: 'Degrees',
     }, {
         value: 'Mils',
     }];
+    let selectedBearingValue = bearingData[0].value;
+    if (!(defaultBearingUnits===selectedBearingValue)){
+        selectedBearingValue = bearingData[1].value;
+    }
 
     navigation.setOptions({
         headerTitleStyle: {
@@ -54,18 +62,20 @@ const CalculatorSettings = ({ route, navigation }) => {
         <View style={styles.container}>
             <Dropdown
                 label="Distance Units"
-                placeholder={route.params.distanceUnits}
+                value={selectedDistanceValue}
                 data={distanceData}
                 selectedItemColor='black'
+                itemColor='grey'
                 baseColor='#fff'
                 textColor='#D1D1C7'
                 onChangeText={(val) => updateStateObject({distanceUnits: val})}
             />
             <Dropdown
                 label="Bearing Units"
-                placeholder={route.params.bearingUnits}
+                value={selectedBearingValue}
                 data={bearingData}
                 selectedItemColor='black'
+                itemColor='grey'
                 baseColor='#fff'
                 textColor='#D1D1C7'
                 onChangeText={(val) => updateStateObject({bearingUnits: val})}
