@@ -39,12 +39,12 @@ const CalculatorSettings = ({ route, navigation }) => {
             textAlign: 'center',
         },
         headerRight: () => (
-            <TouchableOpacity style={{marginRight: 5}} onPress={() => navigation.navigate('CalculatorScreen')}>
+            <TouchableOpacity style={{marginRight: 10}} onPress={() => navigation.navigate('CalculatorScreen')}>
                 <Text> Cancel </Text>
             </TouchableOpacity>
         ),
         headerLeft: () => (
-            <TouchableOpacity style={{marginLeft: 5}} onPress={() =>{
+            <TouchableOpacity style={{marginLeft: 10}} onPress={() =>{
                 let distanceUnits = state.distanceUnits
                 let bearingUnits = state.bearingUnits
                 navigation.navigate('CalculatorScreen', {
