@@ -36,13 +36,13 @@ const CalculatorHistory = ({ route, navigation }) => {
     let lon2 = item.lon2;
     let timestamp = item.timestamp;
     return (
-      <View style={{margin: 5}}> {/**Added a margin in all directions to provide a bit of breathing room for the finger, the empty space between views cannot be selected */}
-        <TouchableHighlight onPress={() => {navigation.navigate('CalculatorScreen', {item})}}>
+      <View style={styles.itemViewStyle}>
+        <TouchableHighlight activeOpacity={0.3} underlayColor='#383835' onPress={() => {navigation.navigate('CalculatorScreen', {item})}}>
           <View>
             <Text style={styles.textStyle}>Start: {lat1}, {lon1}</Text>
             <Text style={styles.textStyle}>End: {lat2}, {lon2}</Text>
             <Text style={{...styles.textStyle, ...styles.timeStyle}}>{timestamp}</Text>{/*FIXME insert styling here */}
-            <View style={{borderBottomColor: '#B8B8AE', borderBottomWidth: 2,}}/>
+            
           </View>
         </TouchableHighlight>
       </View>
@@ -50,7 +50,8 @@ const CalculatorHistory = ({ route, navigation }) => {
   };
 
   return (
-    <FlatList 
+    <FlatList
+      ItemSeparatorComponent={() => {return(<View style={{...styles.itemViewStyle, ...styles.itemSeparatorStyle}}/>)}}
       keyExtractor={(item) => item.id}
       data={history}
       renderItem={renderHistory}/>
@@ -70,6 +71,15 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontStyle: 'italic',
     fontSize: 14,
+  },
+  itemViewStyle: {
+    marginLeft: 10, 
+    marginRight: 10,
+  },
+  itemSeparatorStyle: {
+    borderBottomColor: '#B8B8AE', 
+    borderBottomWidth: 2, 
+    marginBottom: 5,
   },
  });
 
