@@ -4,7 +4,6 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Dropdown } from 'react-native-material-dropdown';
 
 const CalculatorSettings = ({ route, navigation }) => {
-    console.log(route.params);
     const defaultDistanceUnits = route.params.distanceUnits;
     const defaultBearingUnits = route.params.bearingUnits;
     const [state, setState] = useState({ distanceUnits: defaultDistanceUnits, bearingUnits: defaultBearingUnits });

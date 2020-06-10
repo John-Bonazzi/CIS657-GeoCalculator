@@ -11,6 +11,6 @@ web-build/
 web-report/
 .idea
 fb-credentials.js
-
+OWKey.js
 # macOS
 .DS_Store

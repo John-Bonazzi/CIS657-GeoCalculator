@@ -14,17 +14,17 @@ export function storeEntry(item) {
 }
 
 export function setupCalculatorListener(updateFunc) {
-  console.log('setupCalculatorListener called');
+  //console.log('setupCalculatorListener called');
   firebase
     .database()
     .ref('CalculatorHistory/')
     .on('value', (snapshot) => {
-      console.log('setupCalculatorListener fires up with: ', snapshot);
+      //console.log('setupCalculatorListener fires up with: ', snapshot);
       if (snapshot?.val()) {//FIXME: didn't change, but should work
         const fbObject = snapshot.val();
         const newArr = [];
         Object.keys(fbObject).map((key, index) => {
-          console.log(key, '||', index, '||', fbObject[key]);
+          //console.log(key, '||', index, '||', fbObject[key]);
           newArr.push({ ...fbObject[key], id: key });
         });
         updateFunc(newArr);

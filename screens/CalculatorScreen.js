@@ -1,11 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Image } from 'react'
 import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
 import { ThemeProvider, Button, Input } from 'react-native-elements'
 import { computeBearing, computeDistance, round } from '../helpers/helper'
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { storeEntry, initCalculatorDB } from '../helpers/fb-calculator';
+import { getWeather } from '../api/OWServer';
 
+const ICONS = {
+  img01d: require('../assets/img01d.png'),
+  img01n: require('../assets/img01n.png'),
+  img02d: require('../assets/img02d.png'),
+  img02n: require('../assets/img02n.png'),
+  img03d: require('../assets/img03d.png'),
+  img03n: require('../assets/img03n.png'),
+  img04d: require('../assets/img04d.png'),
+  img04n: require('../assets/img04n.png'),
+  img09d: require('../assets/img09d.png'),
+  img09n: require('../assets/img09n.png'),
+  img10d: require('../assets/img10d.png'),
+  img10n: require('../assets/img10n.png'),
+  img13d: require('../assets/img13d.png'),
+  img13n: require('../assets/img13n.png'),
+  img50d: require('../assets/img13d.png'),
+  img50n: require('../assets/img13n.png'),
+ };
+ 
 const theme = {
   Input: {
     errorStyle: {
@@ -28,14 +48,30 @@ const theme = {
   },
 };
 
+//FIXME: used to render HW5
+const renderWeather = (weather) => {
+  if (weather.icon === '') {
+    return <View></View>;
+  } else {
+    return (
+      <View style={styles.weatherView}>
+        <Image
+          style={{ width: 100, height: 100 }}
+          source={ICONS['img' + weather.icon]}
+        />
+        <View>
+          <Text style={{ fontSize: 56, fontWeight: 'bold' }}>
+            {round(weather.temperature,0)}
+          </Text>
+          <Text> {weather.description} </Text>
+        </View>
+      </View>
+    );
+  }
+};
+
+
 const CalculatorScreen = ({ route, navigation }) => {
-  useEffect(() => {
-    try {
-      initCalculatorDB();
-    } catch (err) {
-      console.log('err');
-    }
-  }, []);
 
   const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceText: '', bearingText: '', distanceUnits: 'Kilometers', bearingUnits: 'Degrees' });
   const updateStateObject = (vals) => {
@@ -59,6 +95,17 @@ const CalculatorScreen = ({ route, navigation }) => {
       ...vals,
     });
   };
+
+  const [sourceWeather, setSourceWeather] = useState([]);
+  const [destWeather, setDestWeather] = useState([]);
+
+  useEffect(() => {
+    try {
+      initCalculatorDB();
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   useEffect(() => {
     let dist = state.distance;
@@ -153,7 +200,6 @@ const CalculatorScreen = ({ route, navigation }) => {
     if (isNum(state.lat1, false) && isNum(state.lat2, false) && isNum(state.lon1, false) && isNum(state.lon2, false)) {
       let dist = computeDistance(state.lat1, state.lon1, state.lat2, state.lon2) * distanceMultipliers.multiplier;
       dist = round(dist, 3);
-      console.log('compute multipl: ' + distanceMultipliers.multiplier);
       let bear = computeBearing(state.lat1, state.lon1, state.lat2, state.lon2) * bearingMultipliers.multiplier;
       bear = round(bear, 3);
       updateStateObject({
@@ -164,6 +210,7 @@ const CalculatorScreen = ({ route, navigation }) => {
       });
       const historyItem = { lat1: state.lat1, lon1: state.lon1, lat2: state.lat2, lon2: state.lon2 };
       storeEntry(historyItem);
+      //getWeather(state.lat1, state.lon1, (data) => {console.log(data)})
     }
   };
 
@@ -235,7 +282,6 @@ const CalculatorScreen = ({ route, navigation }) => {
           <View style={styles.gridBlock}><View style={styles.block}><Text> Bearing: </Text></View></View>
           <View style={styles.gridBlock}><View style={styles.block}><Text>{state.bearingText}</Text></View></View>
         </View>
-
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -259,8 +305,8 @@ const styles = StyleSheet.create({
   block: {
     margin: 10,
   },
-  emptySpace: {
-    flex: 6,
+  weatherView: {
+
   },
 });
 
