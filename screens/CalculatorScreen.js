@@ -1,11 +1,11 @@
-import React, { useState, useEffect, Image } from 'react'
-import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { StyleSheet, Text, View, TouchableWithoutFeedback, SafeAreaView, Keyboard, FlatList, Image } from 'react-native'
 import { ThemeProvider, Button, Input } from 'react-native-elements'
 import { computeBearing, computeDistance, round } from '../helpers/helper'
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { storeEntry, initCalculatorDB } from '../helpers/fb-calculator';
-import { getWeather } from '../api/OWServer';
+import { getWeather } from '../api/OWServer.js';
 
 import { setupCalculatorListener } from '../helpers/fb-calculator';
 
@@ -50,22 +50,21 @@ const theme = {
   },
 };
 
-//FIXME: used to render HW5
-const renderWeather = (weather) => {
-  if (weather.icon === '') {
+const renderWeather = ( { index, item }) => {
+  if (!item.icon || item.icon === "") {
     return <View></View>;
   } else {
     return (
       <View style={styles.weatherView}>
         <Image
           style={{ width: 100, height: 100 }}
-          source={ICONS['img' + weather.icon]}
+          source={ICONS['img' + item.icon]}
         />
-        <View>
-          <Text style={{ fontSize: 56, fontWeight: 'bold' }}>
-            {round(weather.temperature,0)}
+        <View style={{flex: 1, justifyContent:'flex-end', marginRight: 10, marginBottom: 5}}>
+          <Text style={{ fontSize: 56, fontWeight: 'bold', textAlign: 'right' }}>
+            {`${round(item.temperature,0)}°F`}
           </Text>
-          <Text> {weather.description} </Text>
+          <Text style={{textAlign: 'right'}}> {item.description} </Text>
         </View>
       </View>
     );
@@ -77,6 +76,7 @@ const comparator = (item1, item2) => {
 };
 
 const CalculatorScreen = ({ route, navigation }) => {
+  
   const [history, setHistory] = useState([]);
   const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceText: '', bearingText: '', distanceUnits: 'Kilometers', bearingUnits: 'Degrees' });
   const updateStateObject = (vals) => {
@@ -101,14 +101,14 @@ const CalculatorScreen = ({ route, navigation }) => {
     });
   };
 
-  const [sourceWeather, setSourceWeather] = useState([]);
-  const [destWeather, setDestWeather] = useState([]);
+  const [sourceWeather, setSourceWeather] = useState({id: '0'});
+  const [destWeather, setDestWeather] = useState({id: '1'});
 
   useEffect(() => {
     try {
       initCalculatorDB();
     } catch (err) {
-      console.log('err');
+      console.log(err);
     }
     setupCalculatorListener((history) => {
       setHistory(history.sort(comparator))});
@@ -217,7 +217,8 @@ const CalculatorScreen = ({ route, navigation }) => {
       });
       const historyItem = { lat1: state.lat1, lon1: state.lon1, lat2: state.lat2, lon2: state.lon2 };
       storeEntry(historyItem);
-      //getWeather(state.lat1, state.lon1, (data) => {console.log(data)})
+      getWeather(state.lat1, state.lon1, setSourceWeather);
+      getWeather(state.lat2, state.lon2, setDestWeather);
     }
   };
 
@@ -289,6 +290,11 @@ const CalculatorScreen = ({ route, navigation }) => {
           <View style={styles.gridBlock}><View style={styles.block}><Text> Bearing: </Text></View></View>
           <View style={styles.gridBlock}><View style={styles.block}><Text>{state.bearingText}</Text></View></View>
         </View>
+        <FlatList
+          keyExtractor={(item) => item.id }
+          data={[sourceWeather, destWeather]}
+          renderItem={renderWeather}
+          />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
@@ -313,7 +319,13 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   weatherView: {
-
+    flex: 1,
+    flexDirection: 'row',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginTop: 20,
+    marginHorizontal: 10, 
+    backgroundColor: '#85857E',
   },
 });
 
