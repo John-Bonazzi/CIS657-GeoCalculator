@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginTop: 20,
     marginHorizontal: 10, 
-    backgroundColor: '#85857E',
+    backgroundColor: '#9E9E96',
   },
 });
 
