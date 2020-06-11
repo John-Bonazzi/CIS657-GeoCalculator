@@ -5,6 +5,7 @@ import { computeBearing, computeDistance, round } from '../helpers/helper'
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { storeEntry, initCalculatorDB } from '../helpers/fb-calculator';
+import { setupCalculatorListener } from '../helpers/fb-calculator';
 
 const theme = {
   Input: {
@@ -27,15 +28,11 @@ const theme = {
     },
   },
 };
-
+const comparator = (item1, item2) => {
+  return Date(item1.timestamp) > Date(item2.timestamp); 
+};
 const CalculatorScreen = ({ route, navigation }) => {
-  useEffect(() => {
-    try {
-      initCalculatorDB();
-    } catch (err) {
-      console.log('err');
-    }
-  }, []);
+  const [history, setHistory] = useState([]);
 
   const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceText: '', bearingText: '', distanceUnits: 'Kilometers', bearingUnits: 'Degrees' });
   const updateStateObject = (vals) => {
@@ -59,6 +56,16 @@ const CalculatorScreen = ({ route, navigation }) => {
       ...vals,
     });
   };
+
+  useEffect(() => {
+    try {
+      initCalculatorDB();
+    } catch (err) {
+      console.log('err');
+    }
+    setupCalculatorListener((history) => {
+      setHistory(history.sort(comparator))});
+  }, []);
 
   useEffect(() => {
     let dist = state.distance;
@@ -186,7 +193,7 @@ const CalculatorScreen = ({ route, navigation }) => {
     headerLeft: () => (
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('CalculatorHistory');
+          navigation.navigate('CalculatorHistory', {currentHistory: history});
         }
         }
       >
