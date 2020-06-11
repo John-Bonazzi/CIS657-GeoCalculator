@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, separators } from 'react-native';
 import { TouchableOpacity, TouchableHighlight } from 'react-native-gesture-handler';
 import Toast from 'react-native-root-toast';
-import { setupCalculatorListener } from '../helpers/fb-calculator';
 
 
-const comparator = (item1, item2) => {
-  return Date(item1.timestamp) > Date(item2.timestamp); 
-};
+
 
 const CalculatorHistory = ({ route, navigation }) => {
-  const [history, setHistory] = useState([]);
-
-  useEffect(() => {
-    setupCalculatorListener((history) => {
-      setHistory(history.sort(comparator))})
-  }, []);
+  const {currentHistory}  = route.params;
 
   navigation.setOptions({
     headerLeft: () => (
@@ -53,7 +45,7 @@ const CalculatorHistory = ({ route, navigation }) => {
     <FlatList
       ItemSeparatorComponent={() => {return(<View style={{...styles.itemViewStyle, ...styles.itemSeparatorStyle}}/>)}}
       keyExtractor={(item) => item.id}
-      data={history}
+      data={currentHistory}
       renderItem={renderHistory}/>
   );
 };

@@ -5,7 +5,11 @@ import { computeBearing, computeDistance, round } from '../helpers/helper'
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { storeEntry, initCalculatorDB } from '../helpers/fb-calculator';
+<<<<<<< HEAD
 import { getWeather } from '../api/OWServer';
+=======
+import { setupCalculatorListener } from '../helpers/fb-calculator';
+>>>>>>> 00bf8591133b9f38eeb568529b5d38fd20a4e9b6
 
 const ICONS = {
   img01d: require('../assets/img01d.png'),
@@ -47,6 +51,7 @@ const theme = {
     },
   },
 };
+<<<<<<< HEAD
 
 //FIXME: used to render HW5
 const renderWeather = (weather) => {
@@ -70,9 +75,11 @@ const renderWeather = (weather) => {
   }
 };
 
-
+const comparator = (item1, item2) => {
+  return Date(item1.timestamp) > Date(item2.timestamp); 
+};
 const CalculatorScreen = ({ route, navigation }) => {
-
+  const [history, setHistory] = useState([]);
   const [state, setState] = useState({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', distanceText: '', bearingText: '', distanceUnits: 'Kilometers', bearingUnits: 'Degrees' });
   const updateStateObject = (vals) => {
     setState({
@@ -105,6 +112,16 @@ const CalculatorScreen = ({ route, navigation }) => {
     } catch (err) {
       console.log(err);
     }
+  }, []);
+
+  useEffect(() => {
+    try {
+      initCalculatorDB();
+    } catch (err) {
+      console.log('err');
+    }
+    setupCalculatorListener((history) => {
+      setHistory(history.sort(comparator))});
   }, []);
 
   useEffect(() => {
@@ -233,7 +250,7 @@ const CalculatorScreen = ({ route, navigation }) => {
     headerLeft: () => (
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('CalculatorHistory');
+          navigation.navigate('CalculatorHistory', {currentHistory: history});
         }
         }
       >
