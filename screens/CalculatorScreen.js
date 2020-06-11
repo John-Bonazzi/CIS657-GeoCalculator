@@ -279,7 +279,8 @@ const CalculatorScreen = ({ route, navigation }) => {
             onPress={() => compute()} />
           <Button
             title='Clear'
-            onPress={() => updateStateObject({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', bearingText: '', distanceText: '' })}
+            onPress={() => {updateStateObject({ lat1: '', lat2: '', lon1: '', lon2: '', distance: '', bearing: '', bearingText: '', distanceText: '' });
+              setSourceWeather({id: '0', icon:''}); setDestWeather({id: '1', icon:''})}}
           />
         </ThemeProvider>
         <View style={styles.gridRow}>
